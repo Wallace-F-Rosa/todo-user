@@ -22,7 +22,7 @@ describe('TaskService', () => {
         name: 'testTask',
         description: 'Test description',
       };
-      const createdTask = await service.create(task);
+      const createdTask = service.create(task);
       expect(createdTask).toMatchObject(createdTask);
     });
 
@@ -30,7 +30,7 @@ describe('TaskService', () => {
       const task = {
         name: 'testTask',
       };
-      const createdTask = await service.create(task);
+      const createdTask = service.create(task);
       expect(createdTask).toBeInstanceOf(Error);
     });
 
@@ -39,7 +39,7 @@ describe('TaskService', () => {
         name: 1,
         description: {},
       };
-      const createdTask = await service.create(task);
+      const createdTask = service.create(task);
       expect(createdTask).toBeInstanceOf(Error);
     });
   });

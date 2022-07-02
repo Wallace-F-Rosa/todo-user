@@ -1,27 +1,32 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './entities/task.entity';
 
 @Injectable()
 export class TaskService {
-  async create(createTaskDto: CreateTaskDto): Promise<Task | Error> {
-    return createTaskDto;
+  constructor(
+    @Inject('TASK_SERVICE') private readonly taskClient: ClientProxy,
+  ) {}
+  create(createTaskDto: CreateTaskDto): Observable<Task | Error> {
+    return this.taskClient.send<Task>({ cmd: 'create' }, createTaskDto);
   }
 
-  async findAll() {
-    return [];
+  async findAll(where: { name?: string; description?: string }) {
+    return this.taskClient.send<Task>({ cmd: 'list' }, where);
   }
 
   async findOne(id: number) {
-    return {};
+    return this.taskClient.send({ cmd: 'get' }, { id });
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto) {
-    return {};
+    return this.taskClient.send({ cmd: 'update' }, { id, updateTaskDto });
   }
 
   async remove(id: number) {
-    return {};
+    return this.taskClient.send<Task>({ cmd: 'delete' }, id);
   }
 }
