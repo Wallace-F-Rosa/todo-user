@@ -15,7 +15,7 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
         return ClientProxyFactory.create({
           transport: Transport.RMQ,
           options: {
-            urls: [configService.get('AMQP_URL')],
+            urls: [configService.get('CLOUDAMQP_URL')],
             queue: 'tasks_queue',
             queueOptions: {
               durable: false,
