@@ -7,6 +7,7 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 @Module({
   controllers: [TaskController],
   providers: [
+    ConfigService,
     TaskService,
     {
       provide: 'TASK_SERVICE',
