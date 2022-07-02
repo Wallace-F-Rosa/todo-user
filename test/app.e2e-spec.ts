@@ -15,10 +15,17 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+  describe('todo', () => {
+    describe('/todo (POST)', () => {
+      it('valid task', async () => {
+        const task = {
+          name: 'Test task',
+          description: 'Test description'
+        };
+        const res = await request(app.getHttpServer()).post('/todo').send(task);
+        expect(res.status).toEqual(201);
+        expect(res.body).toMatchObject(task);
+      });
+    });
   });
 });
