@@ -16,13 +16,13 @@ describe('AppController (e2e)', () => {
   });
 
   describe('todo', () => {
-    describe('/todo (POST)', () => {
+    describe('/tasks (POST)', () => {
       it('valid task', async () => {
         const task = {
           name: 'Test task',
           description: 'Test description'
         };
-        const res = await request(app.getHttpServer()).post('/todo').send(task);
+        const res = await request(app.getHttpServer()).post('/tasks').send(task);
         expect(res.status).toEqual(201);
         expect(res.body).toMatchObject(task);
       });
