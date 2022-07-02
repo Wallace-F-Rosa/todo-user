@@ -22,7 +22,7 @@ export class TaskController {
 
   @Get()
   findAll() {
-    return this.taskService.findAll();
+    return this.taskService.findAll({});
   }
 
   @Get(':id')
