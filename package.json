@@ -32,7 +32,8 @@
     "amqplib": "^0.10.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.5.5",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@nestjs/schematics": "^8.0.0",
