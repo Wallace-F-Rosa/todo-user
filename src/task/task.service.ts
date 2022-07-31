@@ -11,22 +11,22 @@ export class TaskService {
     @Inject('TASK_SERVICE') private readonly taskClient: ClientProxy,
   ) {}
   create(createTaskDto: CreateTaskDto): Observable<Task | Error> {
-    return this.taskClient.send<Task>({ cmd: 'create' }, createTaskDto);
+    return this.taskClient.send<Task>('createTask', createTaskDto);
   }
 
   async findAll(where: { name?: string; description?: string }) {
-    return this.taskClient.send<Task>({ cmd: 'list' }, where);
+    return this.taskClient.send<Task>('findAllTask', where);
   }
 
   async findOne(id: number) {
-    return this.taskClient.send({ cmd: 'get' }, { id });
+    return this.taskClient.send('findOneTask', { id });
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto) {
-    return this.taskClient.send({ cmd: 'update' }, { id, updateTaskDto });
+    return this.taskClient.send('updateTask', { id, updateTaskDto });
   }
 
   async remove(id: number) {
-    return this.taskClient.send<Task>({ cmd: 'delete' }, id);
+    return this.taskClient.send<Task>('removeTask', id);
   }
 }
