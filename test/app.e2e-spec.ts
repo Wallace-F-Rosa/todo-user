@@ -41,6 +41,8 @@ describe('AppController (e2e)', () => {
           .post('/tasks')
           .send(task);
         expect(res.status).toEqual(400);
+        expect(res.body.message.length).toEqual(Object.keys(task).length);
+        expect(res.body.error).toEqual('Bad Request');
       });
     });
   });
