@@ -20,9 +20,12 @@ describe('AppController (e2e)', () => {
       it('valid task', async () => {
         const task = {
           name: 'Test task',
-          description: 'Test description'
+          description: 'Test description',
+          userId: '3f7e42bf-604c-4bc2-82fd-a3d3c7111510',
         };
-        const res = await request(app.getHttpServer()).post('/tasks').send(task);
+        const res = await request(app.getHttpServer())
+          .post('/tasks')
+          .send(task);
         expect(res.status).toEqual(201);
         expect(res.body).toMatchObject(task);
       });
