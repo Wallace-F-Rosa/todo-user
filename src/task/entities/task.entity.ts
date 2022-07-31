@@ -1,12 +1,6 @@
-import { isNotEmpty, isUUID } from 'class-validator';
-
 export class Task {
-  @isNotEmpty()
   name: string;
-
-  @isNotEmpty()
+  done: boolean;
   description: string;
-
-  @isUUID()
   userId: string;
 }
