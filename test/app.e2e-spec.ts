@@ -1,8 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
-import { v4 as uuid4 } from 'uuid';
+import { AppModule } from '@/app.module';
+import { faker } from '@faker-js/faker';
+import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from '@/user/dto/create-user.dto';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -15,5 +17,22 @@ describe('AppController (e2e)', () => {
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
+  });
+
+  describe('users', () => {
+    describe('/user (POST)', () => {
+      it('create user if data is valid', async () => {
+        const user: CreateUserDto = {
+          username: faker.internet.userName(),
+          passwordHash: await bcrypt.hash(faker.internet.password(20), 10),
+        };
+
+        const res = await request(app.getHttpServer()).post('/user').send(user);
+        expect(res.statusCode).toEqual(201);
+        expect(res.body).toMatchObject(user);
+      });
+
+      it('return error 400 on invalid data', async () => {});
+    });
   });
 });
