@@ -32,7 +32,21 @@ describe('AppController (e2e)', () => {
         expect(res.body).toMatchObject(user);
       });
 
-      it('return error 400 on invalid data', async () => {});
+      it('return error 400 on invalid data', async () => {
+        const invalidUser = {
+          username: 1,
+          passwordHash: { this: 'is wrong' },
+        };
+
+        const res = await request(app.getHttpServer())
+          .post('/user')
+          .send(invalidUser);
+        expect(res.statusCode).toEqual(400);
+        expect(res.body.message.length).toEqual(
+          Object.keys(invalidUser).length,
+        );
+        expect(res.body.error).toEqual('Bad Request');
+      });
     });
   });
 });
