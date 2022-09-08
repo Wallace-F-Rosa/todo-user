@@ -6,6 +6,7 @@ import { faker } from '@faker-js/faker';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '@/user/dto/create-user.dto';
 import { PrismaService } from '@/prisma/prisma.service';
+import { create } from 'domain';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -69,6 +70,43 @@ describe('AppController (e2e)', () => {
         const res = await request(app.getHttpServer()).get('/user');
         expect(res.statusCode).toEqual(200);
         expect(res.body.length).toEqual(createdUsers.length);
+      });
+
+      it('get user from id', async () => {
+        const createdUser = await prisma.user.create({
+          data: {
+            username: faker.internet.userName(),
+            passwordHash: bcrypt.hashSync(faker.internet.password(), 10),
+          },
+        });
+
+        const res = await request(app.getHttpServer()).get(
+          `/user/${createdUser.id}`,
+        );
+        expect(res.statusCode).toEqual(200);
+        expect(res.body).toMatchObject(createdUser);
+      });
+    });
+
+    describe('/user (PUT)', () => {
+      it('update user', async () => {
+        const createdUser = await prisma.user.create({
+          data: {
+            username: faker.internet.userName(),
+            passwordHash: bcrypt.hashSync(faker.internet.password(), 10),
+          },
+        });
+
+        const updateData = {
+          username: 'updatedUserUsername',
+          passwordHash: bcrypt.hashSync(faker.internet.password(), 10),
+        };
+
+        const res = await request(app.getHttpServer())
+          .put(`/user/${createdUser.id}`)
+          .send(updateData);
+        expect(res.statusCode).toEqual(200);
+        expect(res.body).toMatchObject(updateData);
       });
     });
   });
