@@ -109,5 +109,22 @@ describe('AppController (e2e)', () => {
         expect(res.body).toMatchObject(updateData);
       });
     });
+
+    describe('/user (DELETE)', () => {
+      it('delete user', async () => {
+        const createdUser = await prisma.user.create({
+          data: {
+            username: faker.internet.userName(),
+            passwordHash: bcrypt.hashSync(faker.internet.password(), 10),
+          },
+        });
+
+        const res = await request(app.getHttpServer()).delete(
+          `/user/${createdUser.id}`,
+        );
+        expect(res.statusCode).toEqual(200);
+        expect(res.body).toMatchObject(createdUser);
+      });
+    });
   });
 });
