@@ -6,7 +6,6 @@ import { faker } from '@faker-js/faker';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '@/user/dto/create-user.dto';
 import { PrismaService } from '@/prisma/prisma.service';
-import { create } from 'domain';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -125,6 +124,27 @@ describe('AppController (e2e)', () => {
         expect(res.statusCode).toEqual(200);
         expect(res.body).toMatchObject(createdUser);
       });
+    });
+  });
+
+  describe('auth', () => {
+    it('login user', async () => {
+      const user = {
+        username: faker.internet.userName(),
+        password: faker.internet.password(),
+      };
+
+      await prisma.user.create({
+        data: {
+          username: user.username,
+          passwordHash: bcrypt.hashSync(user.password, 10),
+        },
+      });
+      const res = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send(user);
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.token).toBeDefined();
     });
   });
 });

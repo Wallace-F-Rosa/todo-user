@@ -14,12 +14,12 @@ export class UserService {
     return this.prisma.user.create({ data: createUserDto });
   }
 
-  findAll() {
-    return this.prisma.user.findMany({});
+  findAll(where: Prisma.UserWhereInput) {
+    return this.prisma.user.findMany({ where });
   }
 
-  findOne(id: string) {
-    return this.prisma.user.findUniqueOrThrow({ where: { id } });
+  findOne(where: Prisma.UserWhereUniqueInput) {
+    return this.prisma.user.findUniqueOrThrow({ where });
   }
 
   update(id: string, data: UpdateUserDto) {
