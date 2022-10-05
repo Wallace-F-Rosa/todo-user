@@ -6,10 +6,12 @@ import { faker } from '@faker-js/faker';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '@/user/dto/create-user.dto';
 import { PrismaService } from '@/prisma/prisma.service';
+import { AuthService } from '@/auth/auth.service';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
+  let authService: AuthService;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -18,6 +20,7 @@ describe('AppController (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     prisma = moduleFixture.get<PrismaService>(PrismaService);
+    authService = moduleFixture.get<AuthService>(AuthService);
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
   });
@@ -66,12 +69,15 @@ describe('AppController (e2e)', () => {
           };
           createdUsers.push(await prisma.user.create({ data: user }));
         }
-        const res = await request(app.getHttpServer()).get('/user');
+        const authPayload = await authService.getAuthToken(createdUsers[0]);
+        const res = await request(app.getHttpServer())
+          .get('/user')
+          .set('Authorization', `Bearer ${authPayload.token}`);
         expect(res.statusCode).toEqual(200);
         expect(res.body.length).toEqual(createdUsers.length);
       });
 
-      it('get user from id', async () => {
+      it('get info from current user', async () => {
         const createdUser = await prisma.user.create({
           data: {
             username: faker.internet.userName(),
@@ -79,16 +85,18 @@ describe('AppController (e2e)', () => {
           },
         });
 
-        const res = await request(app.getHttpServer()).get(
-          `/user/${createdUser.id}`,
-        );
+        const authPayload = await authService.getAuthToken(createdUser);
+
+        const res = await request(app.getHttpServer())
+          .get(`/user/me`)
+          .set('Authorization', `Bearer ${authPayload.token}`);
         expect(res.statusCode).toEqual(200);
         expect(res.body).toMatchObject(createdUser);
       });
     });
 
     describe('/user (PUT)', () => {
-      it('update user', async () => {
+      it('update current user', async () => {
         const createdUser = await prisma.user.create({
           data: {
             username: faker.internet.userName(),
@@ -101,8 +109,11 @@ describe('AppController (e2e)', () => {
           passwordHash: bcrypt.hashSync(faker.internet.password(), 10),
         };
 
+        const authPayload = await authService.getAuthToken(createdUser);
+
         const res = await request(app.getHttpServer())
-          .put(`/user/${createdUser.id}`)
+          .put(`/user/me`)
+          .set('Authorization', `Bearer ${authPayload.token}`)
           .send(updateData);
         expect(res.statusCode).toEqual(200);
         expect(res.body).toMatchObject(updateData);
@@ -110,7 +121,7 @@ describe('AppController (e2e)', () => {
     });
 
     describe('/user (DELETE)', () => {
-      it('delete user', async () => {
+      it('delete current user', async () => {
         const createdUser = await prisma.user.create({
           data: {
             username: faker.internet.userName(),
@@ -118,9 +129,11 @@ describe('AppController (e2e)', () => {
           },
         });
 
-        const res = await request(app.getHttpServer()).delete(
-          `/user/${createdUser.id}`,
-        );
+        const authPayload = await authService.getAuthToken(createdUser);
+
+        const res = await request(app.getHttpServer())
+          .delete(`/user/me`)
+          .set('Authorization', `Bearer ${authPayload.token}`);
         expect(res.statusCode).toEqual(200);
         expect(res.body).toMatchObject(createdUser);
       });
