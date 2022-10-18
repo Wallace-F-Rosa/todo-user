@@ -13,6 +13,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '@/auth/jwt-auth.guard';
 import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import { MessagePattern } from '@nestjs/microservices';
 
 @Controller('user')
 export class UserController {
@@ -36,6 +37,20 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   findOne(@Request() req) {
     return this.userService.findOne({ id: req.user.id });
+  }
+
+  @MessagePattern({ cmd: 'validateToken' })
+  validateTokenPayload(@Body() payload: { id: string; username: string }) {
+    const user = this.userService.findOne({
+      id: payload.id,
+      username: payload.username,
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    return user;
   }
 
   @ApiBearerAuth()
