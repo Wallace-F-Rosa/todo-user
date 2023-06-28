@@ -19,7 +19,7 @@ export class UserService {
   }
 
   findOne(where: Prisma.UserWhereUniqueInput) {
-    return this.prisma.user.findUniqueOrThrow({ where });
+    return this.prisma.user.findUnique({ where });
   }
 
   update(id: string, data: UpdateUserDto) {

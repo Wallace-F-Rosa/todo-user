@@ -4,11 +4,14 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Body,
   UseGuards,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { ApiBasicAuth } from '@nestjs/swagger';
+import { ApiBasicAuth, ApiBody } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './local-auth.guard';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -17,7 +20,12 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  login(@Request() req) {
-    return this.authService.getAuthToken(req.user);
+  @ApiBody({ type: LoginDto })
+  async login(@Body() data: LoginDto) {
+    const user = await this.authService.validateUser(data);
+    if (!user) {
+      throw new UnauthorizedException();
+    }
+    return this.authService.getAuthToken(user);
   }
 }
